@@ -9,14 +9,18 @@ Run a docker container of the `nginx` image.
 - Use the `--name` flag to give the container a name so that it can be easily referenced later.
 - Use the `--network="host"` flag to allow the container to access the host machine's network.
 - Map the `/etc/nginx/conf.d` directory in the container to the directory on the host machine that holds the `nginx.conf` file.
+- Map the `/etc/nginx/auth` directory in the container to the directory on the host machine that holds the `.htpasswd` file.
 - Map the `/etc/nginx/ssl` directory in the container to the directory on the host machine that holds the SSL certificates from [Let's Encrypt](https://letsencrypt.org/).
 
 ```bash
-docker run --name nginx-proxy \
-	-v /home/ubuntu:/etc/nginx/conf.d \
-	-v /etc/letsencrypt:/etc/nginx/ssl \
-	--network="host" \
-	-d nginx:1.25.2
+docker run --name nginx-proxy -d \
+    -v /home/ubuntu/nginx/config:/etc/nginx/conf.d:ro \
+    -v /home/ubuntu/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd \
+    -v /etc/letsencrypt:/etc/nginx/ssl:ro \
+    -v /home/ubuntu/nginx/entry.sh:/entry.sh \
+    --entrypoint /entry.sh \
+    --network="host" \
+    nginx:1.25.2
 ```
 
 ## Obtaining SSL Certificates
